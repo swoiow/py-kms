@@ -27,30 +27,30 @@ def main():
 		config['verbose'] = True
 	updateConfig()
 	s = socket.socket()
-	print "Connecting to %s on port %d..." % (config['ip'], config['port'])
+	print("Connecting to %s on port %d..." % (config['ip'], config['port']))
 	s.connect((config['ip'], config['port']))
 	if config['verbose']:
-		print "Connection successful!"
+		print("Connection successful!")
 	binder = rpcBind.bind('', config)
 	RPC_Bind = str(binder.generateRequest())
 	if config['verbose']:
-		print "Sending RPC bind request..."
+		print("Sending RPC bind request...")
 	s.send(RPC_Bind)
 	try:
 		bindResponse = s.recv(1024)
-	except socket.error, e:
+	except socket.error as e:
 		if e[0] == 104:
-			print "Error: Connection reset by peer. Exiting..."
+			print("Error: Connection reset by peer. Exiting...")
 			sys.exit()
 		else:
 			raise
 	if bindResponse == '' or not bindResponse:
-		print "No data received! Exiting..."
+		print("No data received! Exiting...")
 		sys.exit()
 	packetType = MSRPCHeader(bindResponse)['type']
 	if packetType == rpcBase.packetType['bindAck']:
 		if config['verbose']:
-			print "RPC bind acknowledged."
+			print("RPC bind acknowledged.")
 		#config['call_id'] += 1
 		'''
 		request = CreateRequest()
@@ -62,10 +62,10 @@ def main():
 		parsed = ReadResponse(response)
 		'''
 	elif packetType == rpcBase.packetType['bindNak']:
-		print MSRPCBindNak(bindResponse).dump()
+		print(MSRPCBindNak(bindResponse).dump())
 		sys.exit()
 	else:
-		print "Something went wrong."
+		print("Something went wrong.")
 		sys.exit()
 
 def updateConfig():
@@ -158,7 +158,7 @@ def CreateRequestBase():
 
 	# Debug Stuff
 	if config['debug']:
-		print "Request Base Dictionary:", requestDict
+		print("Request Base Dictionary:", requestDict)
 
 	request = str()
 	request += struct.pack('<H', requestDict['MinorVer'])
@@ -176,7 +176,7 @@ def CreateRequestBase():
 	request += requestDict['MachineName'].encode('utf-16le')
 	request += ('\0' * 32).encode('utf-16le')
 	if config['debug']:
-		print "Request Base:", binascii.b2a_hex(request), len(request)
+		print("Request Base:", binascii.b2a_hex(request), len(request))
 
 	return request
 
@@ -203,7 +203,7 @@ def CreateRequestV4():
 		"Padding" : str(bytearray(functions.arrayFill([], paddingLength, 0x00)))
 	}
 	if config['debug']:
-		print "Request V4 Data:", v4Data
+		print("Request V4 Data:", v4Data)
 	request = str()
 	request += struct.pack('<I',v4Data["BodyLength"])
 	request += struct.pack('<I',v4Data["BodyLength2"])
@@ -211,7 +211,7 @@ def CreateRequestV4():
 	request += v4Data["Hash"]
 	request += v4Data["Padding"]
 	if config['debug']:
-		print "Request V4:", binascii.b2a_hex(request), len(request)
+		print("Request V4:", binascii.b2a_hex(request), len(request))
 
 	return request
 
@@ -248,7 +248,7 @@ def CreateRequestV5():
 		"Padding" : str(bytearray(functions.arrayFill(bytearray(), paddingLength, 0x00)))
 	}
 	if config['debug']:
-		print "Request V5 Data:", v5Data
+		print("Request V5 Data:", v5Data)
 	request = str()
 	request += struct.pack('<I',v5Data["BodyLength"])
 	request += struct.pack('<I',v5Data["BodyLength2"])
@@ -258,7 +258,7 @@ def CreateRequestV5():
 	request += crypted
 	request += v5Data["Padding"]
 	if config['debug']:
-		print "Request V5:", binascii.b2a_hex(request), len(request)
+		print("Request V5:", binascii.b2a_hex(request), len(request))
 
 	# Return Request
 	return request
@@ -288,7 +288,7 @@ def RPCMessageWrapper(request):
 	wrapperDict['ContextId'] = struct.pack('<H', 0)
 	wrapperDict['Opnum'] = struct.pack('<H', 0)
 	if config['debug']:
-		print "RPC Wrapper Dictionary:", wrapperDict
+		print("RPC Wrapper Dictionary:", wrapperDict)
 
 	wrapper = str()
 	wrapper += wrapperDict['Version']
@@ -304,7 +304,7 @@ def RPCMessageWrapper(request):
 	wrapper += wrapperDict['Opnum']
 	wrapper += request
 	if config['debug']:
-		print "Wrapped Request:", binascii.b2a_hex(wrapper), len(wrapper)
+		print("Wrapped Request:", binascii.b2a_hex(wrapper), len(wrapper))
 
 	# Return the wrapped request
 	return wrapper
@@ -315,13 +315,13 @@ def ReadResponse(data):
 	version2 = data[unknownDataSize + 0]
 
 	if version1 == 4 and version2 == 0:
-		print "Received V4 response"
+		print("Received V4 response")
 		response = ReadResponseV4(data)
 	elif version1 == 5 and version2 == 0:
-		print "Received V5 response"
+		print("Received V5 response")
 		response = ReadResponseV5(data)
 	else:
-		print "Unhandled response version", version1
+		print("Unhandled response version", version1)
 	return response
 
 def ReadResponseV4(data):

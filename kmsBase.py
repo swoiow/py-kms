@@ -244,8 +244,8 @@ class kmsBase:
 
 	def serverLogic(self, kmsRequest):
 		if self.config['debug']:
-			print "KMS Request Bytes:", binascii.b2a_hex(str(kmsRequest))
-			print "KMS Request:", kmsRequest.dump()
+			print("KMS Request Bytes:", binascii.b2a_hex(str(kmsRequest)))
+			print("KMS Request:", kmsRequest.dump())
 
 		if self.config['verbose']:
 			clientMachineId = kmsRequest['clientMachineId'].get()
@@ -261,12 +261,12 @@ class kmsBase:
 			except ImportError:
 				local_dt = requestDatetime
 
-			print "     Machine Name: %s" % kmsRequest.getMachineName()
-			print "Client Machine ID: %s" % str(clientMachineId)
-			print "   Application ID: %s" % self.appIds.get(applicationId, str(applicationId))
-			print "           SKU ID: %s" % self.skuIds.get(skuId, str(skuId))
-			print "   Licence Status: %s" % kmsRequest.getLicenseStatus()
-			print "     Request Time: %s" % local_dt.strftime('%Y-%m-%d %H:%M:%S %Z (UTC%z)')
+			print("     Machine Name: %s" % kmsRequest.getMachineName())
+			print("Client Machine ID: %s" % str(clientMachineId))
+			print("   Application ID: %s" % self.appIds.get(applicationId, str(applicationId)))
+			print("           SKU ID: %s" % self.skuIds.get(skuId, str(skuId)))
+			print("   Licence Status: %s" % kmsRequest.getLicenseStatus())
+			print("     Request Time: %s" % local_dt.strftime('%Y-%m-%d %H:%M:%S %Z (UTC%z)'))
 
 		return self.createKmsResponse(kmsRequest)
 
@@ -285,7 +285,7 @@ class kmsBase:
 		response['vLActivationInterval'] = self.config["VLActivationInterval"]
 		response['vLRenewalInterval'] = self.config["VLRenewalInterval"]
 		if self.config['verbose']:
-			print "      Server ePID: %s" % response["kmsEpid"].decode('utf-16le')
+			print("      Server ePID: %s" % response["kmsEpid"].decode('utf-16le'))
 		return response
 
 import kmsRequestV4, kmsRequestV5, kmsRequestV6, kmsRequestUnknown
@@ -295,18 +295,18 @@ def generateKmsResponseData(data, config):
 	currentDate = datetime.datetime.now().ctime()
 
 	if version == 4:
-		print "Received V%d request on %s." % (version, currentDate)
+		print("Received V%d request on %s." % (version, currentDate))
 		messagehandler = kmsRequestV4.kmsRequestV4(data, config)
 		messagehandler.executeRequestLogic()
 	elif version == 5:
-		print "Received V%d request on %s." % (version, currentDate)
+		print("Received V%d request on %s." % (version, currentDate))
 		messagehandler = kmsRequestV5.kmsRequestV5(data, config)
 		messagehandler.executeRequestLogic()
 	elif version == 6:
-		print "Received V%d request on %s." % (version, currentDate)
+		print("Received V%d request on %s." % (version, currentDate))
 		messagehandler = kmsRequestV6.kmsRequestV6(data, config)
 		messagehandler.executeRequestLogic()
 	else:
-		print "Unhandled KMS version.", version
+		print("Unhandled KMS version.", version)
 		messagehandler = kmsRequestUnknown.kmsRequestUnknown(data, config)
 	return messagehandler.getResponse()

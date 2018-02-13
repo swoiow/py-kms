@@ -118,8 +118,8 @@ class kmsRequestV5(kmsBase):
 		response['padding'] = self.getResponsePadding(bodyLength)
 
 		if self.config['debug']:
-			print "KMS V%d Response: %s" % (self.ver, response.dump())
-			print "KMS V%d Structue Bytes: %s" % (self.ver, binascii.b2a_hex(str(response)))
+			print("KMS V%d Response: %s" % (self.ver, response.dump()))
+			print("KMS V%d Structue Bytes: %s" % (self.ver, binascii.b2a_hex(str(response))))
 
 		return str(response)
 	
