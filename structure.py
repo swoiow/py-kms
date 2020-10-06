@@ -120,7 +120,7 @@ class Structure:
 		data = ''
 		for field in self.commonHdr+self.structure:
 			try:
-				data += self.packField(field[0], field[1])
+				data += self.packField(field[0], field[1]).decode()
 			except Exception as e:
 				if field[0] in self.fields:
 					e.args += ("When packing field '%s | %s | %r' in %s" % (field[0], field[1], self[field[0]], self.__class__),)
@@ -255,17 +255,17 @@ class Structure:
 			elif len(data) % 2:
 				data += '\0'
 			l = pack('<L', len(data)/2)
-			return '%s\0\0\0\0%s%s' % (l,l,data)
-					
+			return '%s\0\0\0\0%s%s' % (l, l, data)
+
 		if data is None:
 			raise Exception("Trying to pack None")
-		
+
 		# literal specifier
 		if format[:1] == ':':
 			return str(data)
 
 		# struct like specifier
-		return pack(format, data)
+		return pack(format, data.encode() if isinstance(data, (str,)) else data)
 
 	def unpack(self, format, data, dataClassOrCode = str, field = None):
 		if self.debug:
@@ -558,7 +558,6 @@ class Structure:
 			self[field[0]] = self.zeroValue(field[1])
 
 	def dump(self, msg = None, indent = 0):
-		import types
 		if msg is None: msg = self.__class__.__name__
 		ind = ' '*indent
 		print("\n%s" % (msg))
